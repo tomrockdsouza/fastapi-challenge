@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Testing orders API</title>
+<style>
+    /* Styles for the overlay */
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+        z-index: 999; /* Make it appear above everything else */
+        display: none; /* Initially hidden */
+    }
+
+    /* Styles for the loading indicator */
+    .loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    /* Styles for the loading spinner */
+    .loader {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/w3-css/4.1.0/w3.css"/>
+</head>
+<body class="w3-center w3-light-green">
+<div class="overlay" id="loading-overlay">
+    <div class="loading">
+        <div class="loader"></div>
+        <p id="timerElement"></p>
+    </div>
+</div>
+<script>
+    async function flow(element_id){
+        const data = JSON.parse(document.getElementById(element_id).innerText);
+        document.getElementById('loading-overlay').style.display='block';
+        const timerElement = document.getElementById('timerElement');
+        timerElement.textContent=0;
+        console.log(data);
+        let timerValue=0;
+        timerInterval = setInterval(() => {
+            timerValue++;
+            timerElement.textContent = timerValue;
+        }, 1000);
+        try {
+            const response = await fetch('orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+            alert(`status code: ${response.status} | text: ${await response.text()}`);
+            document.getElementById('loading-overlay').style.display='none';
+            clearInterval(timerInterval);
+        } catch (error) {
+            console.log(error);
+            document.getElementById('loading-overlay').style.display='none';
+            clearInterval(timerInterval);
+        }
+    }
+</script>
+<div class="w3-content w3-white w3-padding-32" style="margin-top: 15px;">
+<h3>Create Order #1</h3>
+<code id="block1">
+    {
+    "user_id": "7c11e1ce2741",
+    "product_code": "classic-box"
+    }
+</code>
+<button onclick="flow('block1')"> Test </button>
+    <hr>
+<h3>Create Order #2</h3>
+<code id="block2">
+    {
+    "user_id": "7c11e1ce2741",
+    "product_code": "family-box"
+    }
+</code>
+<button onclick="flow('block2')"> Test </button>
+    <hr>
+<h3>Create Order #3</h3>
+<code id="block3">
+    {
+    "user_id": "7c11e1ce2741",
+    "product_code": "veggie-box"
+    }
+</code>
+<button onclick="flow('block3')"> Test </button>
+    <hr>
+<h3>Create Order #4</h3>
+<code id="block4">
+    {
+    "user_id": "e6f24d7d1c7e",
+    "product_code": "classic-box"
+    }
+</code>
+<button onclick="flow('block4')"> Test </button>
+    <hr>
+<h3>Create Order #5</h3>
+<code id="block5">
+    {
+    "user_id": "e6f24d7d1c7e",
+    "product_code": "family-box"
+    }
+</code>
+<button onclick="flow('block5')"> Test </button>
+    <hr>
+<h3>Create Order #6</h3>
+<code id="block6">
+    {
+    "user_id": "e6f24d7d1c7e",
+    "product_code": "veggie-box"
+    }
+</code>
+<button onclick="flow('block6')"> Test </button>
+</div>
+</body>
+</html>

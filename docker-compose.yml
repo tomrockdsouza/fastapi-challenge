@@ -1,0 +1,74 @@
+version: '3'
+
+services:
+
+  # TO BE IMPLEMENTED
+  order-service:
+    restart: always
+    build:
+      context: orders/
+      dockerfile: fastapi-build/Dockerfile
+    entrypoint: [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80", "--reload","--workers","4"]
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: "database"
+      product-service: "product-service:8080"
+      user-service: "user-service:8080"
+      rabbitmq_host: "rabbitmq"
+      rabbitmq_port: "5672"
+    ports:
+      - "80:80"
+    volumes:
+      - ./orders:/app
+    depends_on:
+      - database
+      - user-service
+      - migrations
+      - product-service
+      - rabbitmq
+
+  # TO BE IMPLEMENTED
+  database:
+    image: postgres:alpine
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+
+  migrations:
+    restart: no
+    build:
+      context: orders/
+      dockerfile: alembic-build/Dockerfile
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: "database"
+    depends_on:
+      - database
+
+  product-service:
+    image: rodolpheche/wiremock:2.23.2-alpine
+    command: --verbose
+    volumes:
+      - ./wiremock/product-service/stubs:/home/wiremock
+    ports:
+    - "8081:8080"
+
+  user-service:
+    image: rodolpheche/wiremock:2.23.2-alpine
+    command: --verbose
+    volumes:
+      - ./wiremock/user-service/stubs:/home/wiremock
+    ports:
+    - "8082:8080"
+
+  rabbitmq:
+    image: rabbitmq:3.7.15-management-alpine
+    env_file:
+      - .env
+    ports:
+      - "5672:5672"
+      - "15672:15672"

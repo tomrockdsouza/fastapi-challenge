@@ -1,0 +1,5 @@
+$env:POSTGRES_USER = "orders_user"
+$env:POSTGRES_PASSWORD = "Tomrock-123"
+$env:POSTGRES_HOST = "localhost"
+$env:POSTGRES_PORT = "5432"
+$env:POSTGRES_DB = "orders_microservice"
